@@ -68,6 +68,31 @@ static long __syscall(long n, long a, long b, long c, long d, long e, long f) {
 
 	return ret;
 }
+
+#elif defined(__i386__)
+__attribute__((noinline, noipa))
+static long __syscall(long n, long a, long b, long c, long d, long e, long f)
+{
+	long _eax = (long)(n);
+	long _arg6 = (long)(f);
+	__asm__ volatile (
+		"pushl	%[_arg6]\n\t"
+		"pushl	%%ebp\n\t"
+		"movl	4(%%esp),%%ebp\n\t"
+		"int	$0x80\n\t"
+		"popl	%%ebp\n\t"
+		"addl	$4,%%esp\n\t"
+		: "+a"(_eax)
+		: "b"(a),
+		  "c"(b),
+		  "d"(c),
+		  "S"(d),
+		  "D"(e),
+		  [_arg6]"m"(_arg6)
+		: "memory", "cc"
+	);
+	return _eax;
+}
 #endif
 
 #if 0 // this is here so YOU can copy-paste below C entry
@@ -109,6 +134,15 @@ void __start(void) {
 	asm volatile(
 		"mov %rsp, %rdi\n"
 		"jmp prep_main\n"
+	);
+}
+#elif defined(__i386__)
+__attribute__((naked, section(".text.start"))) 
+void __start(void) {
+	asm volatile(
+		"movl %esp, %eax\n"
+		"pushl %eax\n"
+		"call prep_main\n"
 	);
 }
 #endif
