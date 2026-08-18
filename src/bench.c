@@ -30,6 +30,11 @@ cpu_set_t cpuset;
 static long payload_faccessat2() {	
 	return __syscall(SYS_faccessat2, AT_FDCWD, (long)devnull, F_OK, 0, NONE, NONE);
 }
+#endif
+
+static long payload_execveat() {	
+	return __syscall(SYS_execveat, AT_FDCWD, (long)devnull, NULL, NULL, 0, NONE);
+}
 
 __attribute__((always_inline))
 static bool run_forked_payload(long (*payload_fn)())
@@ -60,7 +65,6 @@ main_thread:
 
 	return true;
 }
-#endif
 
 /**
  * NOTE: this might be actually slower now as this forces a syscall
@@ -162,6 +166,8 @@ static int bench_main(char **argv)
 	bool has_access_sc = run_forked_payload(payload_faccessat2);
 #endif
 
+	bool has_execveat = run_forked_payload(payload_execveat);
+
 #define PR_GET_SECCOMP	21
 	int seccomp_status = __syscall(SYS_prctl, PR_GET_SECCOMP, NONE, NONE, NONE, NONE, NONE);
 
@@ -239,6 +245,10 @@ start_loop:
 #define SYS_newfstatat SYS_fstatat64
 #endif
 	run_bench(SYS_execve, (long)tests[j], NULL, NULL, NONE, NONE, NONE, true, "execve:      ");
+
+	if (has_execveat)
+		run_bench(SYS_execveat, AT_FDCWD, (long)tests[j], NULL, NULL, 0, NONE, true, "execveat:    ");
+
 	run_bench(SYS_newfstatat, AT_FDCWD, (long)tests[j], (long)&st, AT_SYMLINK_NOFOLLOW, NONE, NONE, true, "newfstatat:  ");
 	run_bench(SYS_faccessat, AT_FDCWD, (long)tests[j], F_OK, NONE, NONE, NONE, true, "faccessat:   ");
 
