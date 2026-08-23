@@ -1,4 +1,5 @@
 import { exec, spawn, toast } from 'kernelsu-alt';
+import { isDev } from './utils.js';
 import '@material/web/button/filled-button.js';
 import '@material/web/button/outlined-button.js';
 import '@material/web/chips/chip-set.js';
@@ -149,7 +150,7 @@ function setupKsuFlagListeners() {
 
 async function initKsuFlags() {
     const parseInfoFlags = (text) => {
-        if (import.meta.env.DEV) return 5;
+        if (isDev()) return 5;
         const match = text.match(/^flags:\s*(\d+)$/m);
         if (!match) throw new Error('Missing flags value in toolkit --getinfo output');
         return Number.parseInt(match[1], 10);
@@ -171,7 +172,7 @@ function checkUidFeature() {
         { env: { PATH: `$PATH:${modDir}` }}
     ).then((result) => {
         document.getElementById('manager-loading').classList.remove('active');
-        if (result.errno !== 0 && !import.meta.env.DEV) {
+        if (result.errno !== 0 && !isDev()) {
             document.getElementById('crown-unsupported').classList.add('active');
             return;
         }
@@ -303,7 +304,7 @@ function setupUmountPageListener() {
 
 function checkUmountFeature() {
     exec(`${bin} --getlist`, { env: { PATH: `$PATH:${modDir}` }}).then((result) => {
-        if (result.stderr.trim() === 'fail' && !import.meta.env.DEV) {
+        if (result.stderr.trim() === 'fail' && !isDev()) {
             document.getElementById('umount-unsupported').classList.add('active');
             return;
         }
@@ -399,7 +400,7 @@ export function appendSuLogList(newList, currentDate) {
 
 function checkSuLogFeature() {
     exec(`${bin} --sulog`, { env: { PATH: `$PATH:${modDir}` }}).then((result) => {
-        if (result.stdout.trim() === '' && !import.meta.env.DEV) {
+        if (result.stdout.trim() === '' && !isDev()) {
             document.getElementById('sulist-loading').classList.remove('active');
             document.getElementById('sulog-unsupported').classList.add('active');
             return;

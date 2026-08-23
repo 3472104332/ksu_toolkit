@@ -1,4 +1,5 @@
 import { exec } from 'kernelsu-alt';
+import { isDev } from './utils.js';
 import { modDir, bin, ksuDir, ksud, umountEntryFile } from './index.js';
 
 let umountProvider = 'none';
@@ -6,7 +7,7 @@ let umountList = [], umountedList = [], mountEntryList = [];
 
 async function getUmountList() {
     // Vite debug
-    if (import.meta.env.DEV) {
+    if (isDev()) {
         umountList = ["/system/etc/hosts", "/system/bin/su"];
         return;
     }
@@ -22,7 +23,7 @@ async function getUmountList() {
 
 async function getUmountedList() {
     // Vite debug
-    if (import.meta.env.DEV) {
+    if (isDev()) {
         umountedList = ["/system/etc/hosts"];
         return;
     }
@@ -38,7 +39,7 @@ async function getUmountedList() {
 
 async function getMountEntryList() {
     // Vite debug
-    if (import.meta.env.DEV) {
+    if (isDev()) {
         mountEntryList = [
             { source: "overlay", mount_point: "/system/app", fs_type: "overlay", options: "ro", dump: 0, pass: 0 },
             { source: "KSU", mount_point: "/system/etc/hosts", fs_type: "overlay", options: "ro", dump: 0, pass: 0 },
@@ -81,7 +82,7 @@ async function getUmountProvider() {
         grep -i "Welcome to" ${ksuDir}/logcat.log || true
     `).then((result) => {
         const output = result.stdout.trim();
-        if (import.meta.env.DEV) { // Vite debug
+        if (isDev()) { // Vite debug
             umountProvider = "zygisknext";
         } else if (output.includes("enforce_denylist")) {
             if (parseInt(output.split(':')[1] !== 0)) {

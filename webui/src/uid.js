@@ -1,4 +1,5 @@
 import { toast, exec, spawn, listPackages, getPackagesInfo } from 'kernelsu-alt';
+import { isDev } from './utils.js';
 import { modDir, bin, ksuDir, uidFile, versionFile} from './index.js';
 
 let manager = [];
@@ -27,7 +28,7 @@ async function getKsuManager() {
                 });
             } catch (e) {
                 // Vite debug
-                if (import.meta.env.DEV) {
+                if (isDev()) {
                     manager = [
                         { packageName: "me.weishu.kernelsu", appLabel: "KernelSU", uid: 10006 },
                         { packageName: "com.kowx712.supermanager", appLabel: "KowSU", uid: 10007 }

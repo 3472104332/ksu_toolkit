@@ -1,4 +1,5 @@
 import { spawn, listPackages, getPackagesInfo } from 'kernelsu-alt';
+import { isDev } from './utils.js';
 import { modDir, bin, appendSuLogList } from './index.js';
 
 let appList = [], sulogList = [], sulogOld = [], upTime = 0;
@@ -23,7 +24,7 @@ async function getAppList() {
         });
     } catch (e) {
         // Vite debug
-        if (import.meta.env.DEV) {
+        if (isDev()) {
             appList = [
                 { packageName: "com.android.example", appLabel: "Example", uid: 10008 },
             ];
@@ -47,7 +48,7 @@ function getSulog() {
         copy.push({ uid: userId, sym: symbol, time: timeStamp });
     });
     result.on('exit', () => {
-        if (import.meta.env.DEV) { // Vite debug
+        if (isDev()) { // Vite debug
             upTime = 800;
             copy.push({ uid: 10008, sym: '$', time: 20 });
         }

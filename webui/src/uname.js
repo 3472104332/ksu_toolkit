@@ -1,8 +1,9 @@
 import { exec, toast } from 'kernelsu-alt';
+import { isDev } from './utils.js';
 import { bin, modDir, unameFile } from './index.js'
 
 async function getUname() {
-    if (import.meta.env.DEV) { // vite debug
+    if (isDev()) { // vite debug
         document.getElementById('uname-release').value = "6.18.2-spoofed";
         document.getElementById('uname-version').value = "#1 SMP PREEMPT_DYNAMIC Thu, 18 Dec 2025 18:00:18 +0000";
     }
